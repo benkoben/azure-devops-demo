@@ -1,0 +1,83 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+    - main
+
+# change this to self-hosted pool
+pool:
+  name: "Azure Pipelines"
+  vmImage: 'ubuntu-18.04'
+
+
+variables:
+    # ------ Do change variables below --------
+    # See "service connections" under Azure DevOps organization settings
+    - name: env
+      value: dev
+
+    - name: azure_subscription
+      value: 'azure-devops-demo-sp'
+
+    - name: terraform_version
+      value: '0.15.0' # terraform-compliance requires this version explicitly. Check https://github.com/terraform-compliance/cli/blob/master/CHANGELOG.md
+
+    - group: 'devops-service-connection-credentials'
+
+stages:
+  - stage: 'VerifyAndPublish'
+    displayName: 'Continuous Integration'
+    jobs:
+      - job: "Build"
+        continueOnError: false
+        steps:
+
+        - checkout: self
+          persistCredentials: true
+          clean: true
+
+        - task: TerraformTaskV2@2
+          displayName: 'Terraform init'
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(Build.SourcesDirectory)/project/terraform'
+            backendServiceArm: ''
+            backendAzureRmResourceGroupName: "ado-demo-weeu-dev-001"
+            backendAzureRmStorageAccountName: "$(svc-azr-devops-storage-account-name)"
+            backendAzureRmContainerName: "connectivity-weeu-$(env)-001"
+            backendAzureRmKey: "connectivity-weeu-$(env)-001.tfstate"
+
+        - task: TerraformTaskV2@2
+          displayName: 'Terraform plan'
+          inputs:
+            command: plan
+            workingDirectory: '$(Build.SourcesDirectory)/project/terraform'
+            commandOptions: >
+              -var "primary_azure_subscription_id=$(svc-azr-devops-subscription-id)"
+              -var "primary_azure_client_id=$(svc-azr-devops-client-id)"
+              -var "primary_azure_client_secret=$(svc-azr-devops-client-secret)"
+              -var "primary_azure_tenant_id=$(svc-azr-devops-tenant-id)"
+              -input=false 
+              -out $(Build.BuildId).tfplan
+            environmentServiceNameAzureRM: '$(azure_subscription)'
+
+        - task: CmdLine@2
+          displayName: "Perform compliance check"
+          inputs:
+            script: >
+              docker run --rm -v $(Build.SourcesDirectory)/project:/project -i eerkunt/terraform-compliance 
+              -f /project/features
+              -p /project/terraform/tests/$(Build.BuildId).tfplan
+
+        - task: ArchiveFiles@2
+          displayName: 'Create Plan Artifact'
+          inputs:
+            rootFolderOrFile: '$(Build.SourcesDirectory)/project'
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: drop'
