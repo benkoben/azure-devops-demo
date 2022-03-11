@@ -13,9 +13,19 @@ STORAGE_ACCOUNT_NAME="statfweeudev${RANDOM}001"
 KEYVAULT_NAME="keyv-tf-dev-${RANDOM}-001"
 az group create -n "${RG_NAME}" -l "${LOCATION}"
 az storage account create -n ${STORAGE_ACCOUNT_NAME} -g "${RG_NAME}"
-az storage account container -n connectivity-weeu-dev-001 --account-name ${STORAGE_ACCOUNT_NAME}
+STORAGE_ACCOUNT_KEY=$(az storage account keys list -n ${STORAGE_ACCOUNT_NAME} -g "${RG_NAME}" --query [0].value)
+az storage container create --name connectivity-weeu-dev-001 --account-name ${STORAGE_ACCOUNT_NAME} --account-key "${STORAGE_ACCOUNT_KEY}"
 az keyvault create -n ${KEYVAULT_NAME} -g "${RG_NAME}"
 ```
+
+Part 3 - Add keyvault permissions
+
+We need to set Access policies on keyvault so that our pipeline can read secrets
+
+1. Go to your newly created keyvault > access policies and click on "Add"
+1. Search for your service principal by either id or name
+1. Assign GET & LIST access on secret scope
+1. Dont forget to save!
 
 Part 2 - Adding secrets to keyvault
 ===

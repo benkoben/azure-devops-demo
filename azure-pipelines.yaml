@@ -46,7 +46,7 @@ stages:
             provider: 'azurerm'
             command: 'init'
             workingDirectory: '$(Build.SourcesDirectory)/project/terraform'
-            backendServiceArm: ''
+            backendServiceArm: '$(azure_subscription)'
             backendAzureRmResourceGroupName: "ado-demo-weeu-dev-001"
             backendAzureRmStorageAccountName: "$(svc-azr-devops-storage-account-name)"
             backendAzureRmContainerName: "connectivity-weeu-$(env)-001"
