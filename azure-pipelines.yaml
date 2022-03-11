@@ -62,6 +62,8 @@ stages:
               -var "primary_azure_client_id=$(svc-azr-devops-client-id)"
               -var "primary_azure_client_secret=$(svc-azr-devops-client-secret)"
               -var "primary_azure_tenant_id=$(svc-azr-devops-tenant-id)"
+              -var "location=westeurope"
+              -var "env=$(env)"
               -input=false 
               -out $(Build.BuildId).tfplan
             environmentServiceNameAzureRM: '$(azure_subscription)'

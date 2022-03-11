@@ -17,3 +17,13 @@ variable primary_azure_tenant_id {
   type        = string
   description = "description"
 }
+
+variable location {
+  type        = string
+  description = "description"
+}
+
+variable env {
+  type        = string
+  description = "description"
+}
