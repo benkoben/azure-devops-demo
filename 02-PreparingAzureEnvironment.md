@@ -18,7 +18,7 @@ az storage container create --name connectivity-weeu-dev-001 --account-name ${ST
 az keyvault create -n ${KEYVAULT_NAME} -g "${RG_NAME}"
 ```
 
-Part 3 - Add keyvault permissions
+Part 2 - Add keyvault permissions
 ===
 
 We need to set Access policies on keyvault so that our pipeline can read secrets
@@ -28,7 +28,7 @@ We need to set Access policies on keyvault so that our pipeline can read secrets
 1. Assign GET & LIST access on secret scope
 1. Dont forget to save!
 
-Part 2 - Adding secrets to keyvault
+Part 3 - Adding secrets to keyvault
 ===
 
 Create the following secrets in keyvault
@@ -39,7 +39,7 @@ Create the following secrets in keyvault
 * `svc-azr-devops-tenant-id` = the tenant id of azure tenant
 * `svc-azr-devops-storage-account-name` = the name of your newly created storage account
 
-Part 3 - Creating a variable group in DevOps
+Part 4 - Creating a variable group in DevOps
 ===
 
 Before we start creating pipelines we need to make sure devops has a connection to our newly created keyvault. The following steps show how to create a connection to a keyvault and creating a new variable group
