@@ -39,6 +39,7 @@ Create the following secrets in keyvault
 * `svc-azr-devops-storage-account-name` = the name of your newly created storage account
 
 Part 3 - Creating a variable group in DevOps
+===
 
 Before we start creating pipelines we need to make sure devops has a connection to our newly created keyvault. The following steps show how to create a connection to a keyvault and creating a new variable group
 
