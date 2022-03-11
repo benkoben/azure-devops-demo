@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "connectivity" {
 }
 
 resource "azurerm_virtual_network" "connectivity" {
-  name                = ""
+  name                = "vnet-connectivityhub-weeu-${var.env}-001"
   location            = azurerm_resource_group.connectivity.location
   resource_group_name = azurerm_resource_group.connectivity.name
   address_space       = ["10.0.0.0/16"]
